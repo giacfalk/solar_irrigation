@@ -7,7 +7,7 @@ calories <- read.csv(paste0(input_folder, "calories.csv"), stringsAsFactors = F)
 crop_parser$parsed <- NA
 
 for (i in 1:length(crop_parser$FAONAMES)){
-  a <- agrep(crop_parser$FAONAMES[i], calories$ï..ITEM, value=T, max.distance = 1, ignore.case = T)[which.min(nchar(agrep(crop_parser$FAONAMES[i], calories$ï..ITEM, value=T, max.distance = 1, ignore.case = T)))]
+  a <- agrep(crop_parser$FAONAMES[i], calories$ITEM, value=T, max.distance = 1, ignore.case = T)[which.min(nchar(agrep(crop_parser$FAONAMES[i], calories$ITEM, value=T, max.distance = 1, ignore.case = T)))]
 
   crop_parser$parsed[i] <-ifelse(identical(a, character(0)), NA, a)
 
@@ -17,7 +17,7 @@ crop_parser$FAONAMES[is.na(crop_parser$parsed)]
 crop_parser$parsed[is.na(crop_parser$parsed)] <- c("CEREALS NES", "YAUTIA (COCOYAM)", "BROAD BEANS,GREEN", "GROUNDNUTS IN SHELL", "OLIVES", "COTTONSEED", NA, NA, "ORANGES", "APPLES", "CABBAGES", "NA")
 crop_parser$parsed[2] <- "RICE PADDY"
 
-calories <- merge(calories, crop_parser, by.x="ï..ITEM", by.y="parsed") %>% dplyr::select(1:5, 11)
+calories <- merge(calories, crop_parser, by.x="ITEM", by.y="parsed") %>% dplyr::select(1:5, 11)
 
 calories[,2:4] <- calories[,2:4]*10 # convert to kg
 

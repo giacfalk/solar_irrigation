@@ -1,5 +1,9 @@
 scenario <- 1
 
+scenarios <- expand.grid(rcp_ssp, water_sustainability_contraint, field_size_contraint, VAT_import_costs, instalments_business_model, water_tank_storage, discount_rate, no_battery, stringsAsFactors = F)
+
+colnames(scenarios) <- c("rcp_ssp", "water_sustainability_contraint", "field_size_contraint", "VAT_import_costs", "instalments_business_model", "water_tank_storage", "discount_rate", "no_battery")
+
 clusters <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[scenario,], collapse="_"), ".Rds"))
 
 clusters_bk <- read_rds(paste0("clusters_bk_", paste(scenarios[scenario,], collapse="_"), ".Rds"))
@@ -337,7 +341,7 @@ fig3 <- ggplot(data)+
   theme_classic()+
   geom_hline(yintercept = 0, colour="black", size=1, linetype="dashed")+
   geom_col(aes(x=interaction(region), y=value, fill=name), position = "stack", colour="black")+
-  ylab("Yearly average discounted value \n(bn. USD)")+
+  ylab("Yearly average discounted value (bn. USD)")+
   xlab("Region")+
   ggtitle("")+
   scale_fill_manual(name="", values=ggsci::pal_npg("nrc", alpha = .8)(8))+
@@ -350,18 +354,22 @@ clusters_si <-  read_rds(paste0("clusters_with_data_7_", paste(scenarios[scenari
 clusters_si <- filter(clusters_si, !is.na(profit_yearly))
 
 fig3b <- ggplot()+theme_classic()+
-  geom_line(data=arrange(clusters_si, profit_yearly/A_total), aes(x=cumsum(A_total)/1e6, y=profit_yearly/A_total, colour="Profits"))+
-  geom_line(data=arrange(clusters_si, total_system_cost_discounted_yeary/A_total), aes(x=cumsum(A_total)/1e6, y=total_system_cost_discounted_yeary/A_total, colour="Costs"))+
+  geom_hline(yintercept = 100)+
+  geom_hline(yintercept = 50)+
+  geom_text(aes(x=37.5, y = 60, label="~20 million ha with profits >$50/ha/yr."), size=4)+
+  geom_text(aes(x=30, y = 120, label="~10 million ha with profits >$100/ha/yr."), size=4)+
+  geom_line(data=arrange(clusters_si, desc(profit_yearly/A_total)), aes(x=cumsum(A_total)/1e6, y=profit_yearly/A_total, colour="Profits"))+
+  geom_line(data=arrange(clusters_si, desc(total_system_cost_discounted_yeary/A_total)), aes(x=cumsum(A_total)/1e6, y=total_system_cost_discounted_yeary/A_total, colour="Costs"))+
   scale_y_log10()+
   ggsci::scale_colour_npg(name="")+
-  xlab("(Potentially) irrigated cropland area \n(million ha)")+
-  ylab("Potential yearly (discounted) \ncosts/profits (USD/ha, log scale)")+
+  xlab("(Potentially) irrigated cropland area (million ha)")+
+  ylab("Potential yearly (discounted) \ncosts and profits (USD/ha, log scale)")+
   coord_cartesian(ylim=(c(1, 1000)), xlim=(c(0, 50)))
   
 
 fig3_tot <- fig3 + fig3b + plot_layout(ncol=1) + plot_annotation(tag_levels = "A")
 
-ggsave("new_figures/fig3.png", fig3_tot, scale=1.35, height = 5, width = 5.5)
+ggsave("new_figures/fig3.png", fig3_tot, scale=1.35, height = 6.5, width = 6.5)
 
 ####
 

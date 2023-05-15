@@ -11,8 +11,31 @@ prices <- filter(prices, (Area!="Sudan (former)" & Area!="Ethiopia PDR"))
 # 
 # prices_var <- prices %>% group_by(Area, Item) %>% mutate(Value=min_max_norm(Value)) %>%  dplyr::summarise(PSI=sd(Value, na.rm=T)) %>% ungroup() %>% group_by(Area, Item) %>%  dplyr::summarise(PSI=mean(PSI, na.rm=T)) %>% ungroup()
 
+prices_max <- prices %>% filter(Year>2000) %>% group_by(Area, Item) %>%
+  arrange(desc(Year)) %>% slice(1:5) %>% dplyr::summarise(Value=max(Value, na.rm=T)) %>% ungroup()
+
+prices_min <- prices %>% filter(Year>2000) %>% group_by(Area, Item) %>%
+  arrange(desc(Year)) %>% slice(1:5) %>% dplyr::summarise(Value=min(Value, na.rm=T)) %>% ungroup()
+
 prices <- prices %>% filter(Year>2000) %>% group_by(Area, Item) %>%
   arrange(desc(Year)) %>% slice(1:5) %>% dplyr::summarise(Value=median(Value, na.rm=T)) %>% ungroup()
+
+#
+
+if(scenarios$prices_sens[scenario]=="median"){
+  
+  prices <- prices
+  
+} else if(scenarios$prices_sens[scenario]=="min") {
+  
+  prices <- prices_min
+  
+} else{
+  
+  prices <- prices_max
+  
+}
+
 
 #prices <- merge(prices, prices_var, by=c("Area", "Item"), all.x=T)
 

@@ -4,8 +4,8 @@ pacman::p_load(sf, raster, exactextractr, dplyr, readxl, cowplot, ggplot2, scale
 
 tmpDir(create=TRUE)
 
-if (!require("qgisprocess")) remotes::install_github("paleolimbot/qgisprocess"); library(qgisprocess)
-qgis_configure()
+#if (!require("qgisprocess")) remotes::install_github("paleolimbot/qgisprocess"); library(qgisprocess)
+#qgis_configure()
 
 if (!require("rgis")) remotes::install_github("JGCRI/rgis"); library(rgis)
 
@@ -114,7 +114,7 @@ load_curve_irr = load_curve_irrig
 lv_grid_density <- raster(paste0(input_folder, "targets_10km.tif"))
 crs(lv_grid_density) <- crs(population)
 
-ref <- raster(list.files(paste0("D:/MLED_database/", "risultati giacomo"), full.names = T, pattern = "actual", recursive=T)[[1]])
+ref <- raster(list.files(paste0("H:/ECIP/Falchetta/MLED_database/", "risultati giacomo"), full.names = T, pattern = "actual", recursive=T)[[1]])
 
 crs(ref) <- crs(population)
 lv_grid_density <- lv_grid_density>=1

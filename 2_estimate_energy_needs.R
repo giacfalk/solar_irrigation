@@ -88,7 +88,7 @@ img_04 <- raster(paste0(input_folder, "surface_volume.tif"))
 #
 # img_02 <- rgis::mask_raster_to_polygon(img_02, clusters)
 #
-# writeRaster(img_02,"D:/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost/data/noid_image.tif", overwrite=T)
+# writeRaster(img_02,"//tsclient/D/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost/data/noid_image.tif", overwrite=T)
 
 #
 # # Calculate the mean distance from each cluster to the nearest source of surface water

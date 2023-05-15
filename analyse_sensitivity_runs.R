@@ -284,3 +284,84 @@ m3 <- plot_g  + plot_f + plot_layout(ncol=1) + patchwork::plot_annotation(tag_le
         legend.direction = 'vertical')
 
 ggsave("new_figures/batterysens_an_4.png", m3, scale = 2, height = 4, width = 5)
+
+
+############
+############
+
+lower_prices <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1537,], collapse="_"), ".Rds"))
+baseline_prices <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+maximum_prices <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[3073,], collapse="_"), ".Rds"))
+
+a <- sum(lower_prices$total_system_cost_discounted_yeary[!is.na(lower_prices$profit_yearly)], na.rm=T) / 1e9 
+b <- sum(baseline_prices$total_system_cost_discounted_yeary[!is.na(baseline_prices$profit_yearly)], na.rm=T) / 1e9 
+c <- sum(maximum_prices$total_system_cost_discounted_yeary[!is.na(maximum_prices$profit_yearly)], na.rm=T) / 1e9 
+
+d <- sum(lower_prices$total_revenues_discounted_discounted_yearly[!is.na(lower_prices$profit_yearly)], na.rm=T) / 1e9 
+e <- sum(baseline_prices$total_revenues_discounted_discounted_yearly[!is.na(baseline_prices$profit_yearly)], na.rm=T) / 1e9 
+f <- sum(maximum_prices$total_revenues_discounted_discounted_yearly[!is.na(maximum_prices$profit_yearly)], na.rm=T) / 1e9 
+
+g <- sum(lower_prices$profit_yearly[!is.na(lower_prices$profit_yearly)], na.rm=T) / 1e9 
+h <- sum(baseline_prices$profit_yearly[!is.na(baseline_prices$profit_yearly)], na.rm=T) / 1e9 
+i <- sum(maximum_prices$profit_yearly[!is.na(maximum_prices$profit_yearly)], na.rm=T) / 1e9 
+
+j <- sum(lower_prices$npumps[!is.na(lower_prices$profit_yearly)], na.rm=T) / 1e6
+k <- sum(baseline_prices$npumps[!is.na(baseline_prices$profit_yearly)], na.rm=T) / 1e6 
+l <- sum(maximum_prices$npumps[!is.na(maximum_prices$profit_yearly)], na.rm=T) / 1e6 
+
+sens_fs <- data.frame(fs= c("10-yr. min. prices", "Median prices", "10-yr. max prices"), costs=c(a,b,c), revenues=c(d,e,f), profits=c(g,h,i), npumps=c(j,k,l))
+sens_fs <- reshape2::melt(sens_fs, 1)
+sens_fs$fs <- factor(sens_fs$fs, c("10-yr. min. prices", "Median prices", "10-yr. max prices"))
+
+sens_fs$variable = as.factor(sens_fs$variable)
+levels(sens_fs$variable) <- c("Yr. disc. costs (bn.)", "Yr. disc. revenues (bn.)", "Yr. disc. profits (bn.)", "Econo. feas. pumps (mil.)")
+
+plot_crop_prices <- ggplot(sens_fs)+
+  theme_classic()+
+  geom_col(aes(x=variable, y=value, fill=fs), position = "dodge")+
+  ggsci::scale_fill_npg(name="Crop prices")+
+  xlab("")+
+  ylab("")+
+  ggtitle("Sensitivity analysis: crop prices")
+
+ggsave("new_figures/sens_crop_prices.png", plot_crop_prices, scale = 1.5, height = 4, width = 5)
+
+############
+
+lower10_pvcost <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[4609,], collapse="_"), ".Rds"))
+baseline_pvcost <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+lower25_pvcost <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[9217,], collapse="_"), ".Rds"))
+
+a <- sum(lower10_pvcost$total_system_cost_discounted_yeary[!is.na(lower10_pvcost$profit_yearly)], na.rm=T) / 1e9 
+b <- sum(baseline_pvcost$total_system_cost_discounted_yeary[!is.na(baseline_pvcost$profit_yearly)], na.rm=T) / 1e9 
+c <- sum(lower25_pvcost$total_system_cost_discounted_yeary[!is.na(lower25_pvcost$profit_yearly)], na.rm=T) / 1e9 
+
+d <- sum(lower10_pvcost$total_revenues_discounted_discounted_yearly[!is.na(lower10_pvcost$profit_yearly)], na.rm=T) / 1e9 
+e <- sum(baseline_pvcost$total_revenues_discounted_discounted_yearly[!is.na(baseline_pvcost$profit_yearly)], na.rm=T) / 1e9 
+f <- sum(lower25_pvcost$total_revenues_discounted_discounted_yearly[!is.na(lower25_pvcost$profit_yearly)], na.rm=T) / 1e9 
+
+g <- sum(lower10_pvcost$profit_yearly[!is.na(lower10_pvcost$profit_yearly)], na.rm=T) / 1e9 
+h <- sum(baseline_pvcost$profit_yearly[!is.na(baseline_pvcost$profit_yearly)], na.rm=T) / 1e9 
+i <- sum(lower25_pvcost$profit_yearly[!is.na(lower25_pvcost$profit_yearly)], na.rm=T) / 1e9 
+
+j <- sum(lower10_pvcost$npumps[!is.na(lower10_pvcost$profit_yearly)], na.rm=T) / 1e6
+k <- sum(baseline_pvcost$npumps[!is.na(baseline_pvcost$profit_yearly)], na.rm=T) / 1e6 
+l <- sum(lower25_pvcost$npumps[!is.na(lower25_pvcost$profit_yearly)], na.rm=T) / 1e6 
+
+sens_fs <- data.frame(fs= c("10% lower", "Baseline", "25% lower"), costs=c(a,b,c), revenues=c(d,e,f), profits=c(g,h,i), npumps=c(j,k,l))
+sens_fs <- reshape2::melt(sens_fs, 1)
+sens_fs$fs <- factor(sens_fs$fs, c("Baseline", "10% lower",  "25% lower"))
+
+sens_fs$variable = as.factor(sens_fs$variable)
+levels(sens_fs$variable) <- c("Yr. disc. costs (bn.)", "Yr. disc. revenues (bn.)", "Yr. disc. profits (bn.)", "Econo. feas. pumps (mil.)")
+
+plot_pvcost <- ggplot(sens_fs)+
+  theme_classic()+
+  geom_col(aes(x=variable, y=value, fill=fs), position = "dodge")+
+  ggsci::scale_fill_npg(name="PV & batt. cost")+
+  xlab("")+
+  ylab("")+
+  ggtitle("Sensitivity analysis: PV and battery cost")
+
+ggsave("new_figures/sens_pv_batt_cost.png", plot_pvcost, scale = 1.5, height = 4, width = 5)
+  

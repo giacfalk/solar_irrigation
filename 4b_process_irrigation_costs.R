@@ -84,7 +84,7 @@ for (crop in c("barl", "cass", "coco", "cott", "grou", "maiz", "pmil", "smil", "
 #devtools::install_github('https://github.com/USDA-ERS/MTED-HARr.git')
 require(HARr)
 
-data = read_har('G:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CGE/DB_eco_GTAP10_2014.har')
+data = read_har('F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CGE/DB_eco_GTAP10_2014.har')
 
 dimnames(data[["sf01"]])
 
@@ -123,7 +123,7 @@ for (i in ctrs){
     
   }}
 
-data2 = read_har('G:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CGE/DB_AEZ_GTAP10_2014.har')
+data2 = read_har('F:/.shortcut-targets-by-id/13znqeVDfPULc4J_lQLbyW_Kmfa03o63F/3-Research/GIACOMO/CGE/DB_AEZ_GTAP10_2014.har')
 
 dimnames(data2[["area"]])
 

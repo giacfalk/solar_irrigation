@@ -2,6 +2,33 @@ library(readr)
 library(tidyverse)
 library(reshape2)
 
+setwd("C:/Users/falchetta/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost")
+
+rcp_ssp <- c("baseline", "245", "585")
+
+water_sustainability_contraint <- c(F, T)
+
+field_size_contraint <- c(T, F)
+
+VAT_import_costs <- c(T,F)
+
+instalments_business_model <- c(4,3,2,1) # 1. all upfront (system) costs 2. only pump + irr system unfront costs 3. only PV upfront costs 4. no upfront costs
+
+no_battery <- c(T,F)
+
+water_tank_storage <- c(T,F)
+
+discount_rate = c(0.15, 0.075, 0.25, 0.4)
+
+prices_sens <- c("median", "min", "max")
+
+pvbatterycosts_sens <- c("baseline", "minus10pct", "minus25pct") 
+
+scenarios <- expand.grid(rcp_ssp, water_sustainability_contraint, field_size_contraint, VAT_import_costs, instalments_business_model, water_tank_storage, discount_rate, no_battery, stringsAsFactors = F)
+
+colnames(scenarios) <- c("rcp_ssp", "water_sustainability_contraint", "field_size_contraint", "VAT_import_costs", "instalments_business_model", "water_tank_storage", "discount_rate", "no_battery")
+####
+
 baseline_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
 s_245_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[2,], collapse="_"), ".Rds"))
 s_585_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[3,], collapse="_"), ".Rds"))
@@ -38,7 +65,7 @@ uno <- ggplot(t1, aes(x=rcp_ssp, y=i_n/1e9, fill=rcp_ssp))+
   ggsci::scale_fill_npg(name="Scenario")+
   ggtitle("Total irrigation needs in 2050")
 
-#ggsave("D:/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig1.png", uno, scale = 1.5)
+#ggsave("//tsclient/D/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig1.png", uno, scale = 1.5)
 
 ###
 
@@ -75,7 +102,7 @@ due <- ggplot(t1, aes(x=rcp_ssp, y=kwh_n/1e9, fill=rcp_ssp))+
   ggsci::scale_fill_npg(name="Scenario")+
   ggtitle("Solar pumping electricity demand in 2050")
 
-#ggsave("D:/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig2.png", due, scale = 1.5)
+#ggsave("//tsclient/D/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig2.png", due, scale = 1.5)
 
 #
 
@@ -89,12 +116,12 @@ baseline_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[4,], coll
 s_245_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[5,], collapse="_"), ".Rds"))
 s_585_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[6,], collapse="_"), ".Rds"))
 
-baseline_T$which_pumping <- ifelse(is.na(baseline_T$profit_yearly), "Neither possible", baseline_T$which_pumping)
-s_245_T$which_pumping <- ifelse(is.na(s_245_T$profit_yearly), "Neither possible", s_245_T$which_pumping)
-s_585_T$which_pumping <- ifelse(is.na(s_585_T$profit_yearly), "Neither possible", s_585_T$which_pumping)
-baseline_F$which_pumping <- ifelse(is.na(baseline_F$profit_yearly), "Neither possible", baseline_F$which_pumping)
-s_245_F$which_pumping <- ifelse(is.na(s_245_F$profit_yearly), "Neither possible", s_245_F$which_pumping)
-s_585_F$which_pumping <- ifelse(is.na(s_585_F$profit_yearly), "Neither possible", s_585_F$which_pumping)
+baseline_T$which_pumping <- ifelse(is.na(baseline_T$profit_yearly), "Neither", baseline_T$which_pumping)
+s_245_T$which_pumping <- ifelse(is.na(s_245_T$profit_yearly), "Neither", s_245_T$which_pumping)
+s_585_T$which_pumping <- ifelse(is.na(s_585_T$profit_yearly), "Neither", s_585_T$which_pumping)
+baseline_F$which_pumping <- ifelse(is.na(baseline_F$profit_yearly), "Neither", baseline_F$which_pumping)
+s_245_F$which_pumping <- ifelse(is.na(s_245_F$profit_yearly), "Neither", s_245_F$which_pumping)
+s_585_F$which_pumping <- ifelse(is.na(s_585_F$profit_yearly), "Neither", s_585_F$which_pumping)
 
 s1 <- as.vector(table(baseline_T$which_pumping))
 s2 <- as.vector(table(s_245_T$which_pumping))
@@ -120,7 +147,7 @@ shares <- reshape2::melt(shares, 4:6)
 
 shares$rcp_ssp <- factor(shares$rcp_ssp, levels = c("Baseline", "SSP 245", "SSP 585"))
 
-shares$variable <- factor(shares$variable, levels = rev(c("Neither possible", "Ground water pumping", "Surface water pumping")))
+shares$variable <- factor(shares$variable, levels = rev(c("Neither", "Ground water pumping", "Surface water pumping")))
 
 tre <- ggplot(shares, aes(x=rcp_ssp, y=value/sum_cat, fill=variable))+
   theme_classic()+
@@ -131,7 +158,7 @@ tre <- ggplot(shares, aes(x=rcp_ssp, y=value/sum_cat, fill=variable))+
   ggtitle("Water source for solar pumps in 2050")+
   scale_y_continuous(labels=scales::label_percent())
 
-#ggsave("D:/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig3.png", tre, scale = 1.5)
+#ggsave("//tsclient/D/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig3.png", tre, scale = 1.5)
 
 ###
 
@@ -192,7 +219,7 @@ quattro <- ggplot(all, aes(x=variable, y=value/1e9, colour=scen, group=scen))+
   ggsci::scale_colour_npg(name="Climate change scenario")+
   ggtitle("Unmet groundwater demand  in 2050")
 
-#ggsave("D:/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig4.png", quattro, scale = 1.5)
+#ggsave("//tsclient/D/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig4.png", quattro, scale = 1.5)
 
 ######################
 
@@ -218,7 +245,7 @@ cinque <- ggplot(t1, aes(x=rcp_ssp, y=i_n/1e12, fill=rcp_ssp))+
   xlab("")+
   ylab("Trillion calories")+
   ggsci::scale_fill_npg(name="Scenario")+
-  ggtitle("Food growth potential from (economically feasible) \nsolar pumps adoption")
+  ggtitle("Food growth potential from (economically \nfeasible) solar pumps adoption")
 
 #
 
@@ -251,7 +278,12 @@ m <- uno + tre + due + quattro + cinque + sei + patchwork::plot_annotation(tag_l
   theme(legend.position = 'bottom',
         legend.direction = 'horizontal')
 
-m
+m[[1]]$data
+m[[2]]$data
+m[[3]]$data
+m[[4]]$data
+m[[5]]$data
+m[[6]]$data
 
 ggsave("new_figures/fig_scens.png", m, scale = 1.25, height = 7, width = 7)
 

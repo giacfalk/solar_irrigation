@@ -10,7 +10,7 @@ df$crop <- sub("\\&.*", "", df$name)
 df$irr <- sub('.*&', '', df$name)
 
 # 4.2 cluster the MapSPAM crops to match the crop-technology couplets from the Earth's future paper to all the crops
-crops = readxl::read_xlsx(paste0("D:/MLED_database/" , 'crops_cfs_ndays_months.xlsx')) %>% dplyr::select(crop, eta_irr)
+crops = readxl::read_xlsx(paste0("H:/ECIP/Falchetta/MLED_database/" , 'crops_cfs_ndays_months.xlsx')) %>% dplyr::select(crop, eta_irr)
 
 crops$most_sim <- c("Wheat", "Banana", "Maize", "Banana", "Maize", "Maize", "Onions", "Wheat", "Maize", "Commonbeans", "Sugarcane", "Wheat", "Onions")
 
@@ -42,7 +42,7 @@ clusters$rr <- ifelse(is.na(clusters$rr), names(sort(-table(clusters$rr)))[1], c
 ##
 
 list <- as.character(unique(clusters$rr))
-list <- ifelse(is.na(list), "D:/MLED_database/input_folder/pv_cost/Maize&flood.tif", list)
+list <- ifelse(is.na(list), "H:/ECIP/Falchetta/MLED_database/input_folder/pv_cost/Maize&flood.tif", list)
 list2 <- pblapply(list, raster)
 
 clusters$pvcost <- NA
@@ -77,7 +77,7 @@ clusters$pvcost <- ifelse(is.nan(clusters$pvcost), pred, clusters$pvcost)
 
 ###
 
-if(nrow(clusters)!=nrow(read.csv("pvout_t.csv"))){pvout_t <- stack(pblapply(list.files(paste0(input_folder, "monthly"), full.names = T, pattern = "asc"), raster)) ; pvout_t <-  exact_extract(pvout_t, clusters, "mean"); pvout_t <- (pvout_t/30) * 0.65; write.csv(pvout_t, "pvout_t.csv")} else{
+if(nrow(clusters)!=nrow(read.csv("pvout_t.csv"))){pvout_t <- stack(pblapply(list.files(paste0(input_folder, "monthly"), full.names = T, pattern = "asc"), raster)) ; pvout_t <-  exact_extract(pvout_t, clusters, "mean", max_cells_in_memory = 1e9); pvout_t <- (pvout_t/30) * 0.65; write.csv(pvout_t, "pvout_t.csv")} else{
   pvout_t <- read.csv("pvout_t.csv")
   pvout_t$X<- NULL
 }
@@ -207,7 +207,36 @@ inverter_size <- powerpump * 1.3 #W
 ################
 # 2. estimate costs of installing the system and O&M
 
+# solar + battery costs
+
 usdperkwhbattery <- 500
+usdperkwhbattery_lower_10 <- 500 * 0.9
+usdperkwhbattery_lower_25 <- 500 * 0.75
+
+clusters$pvcost_lower_10 <- clusters$pvcost * 0.9
+clusters$pvcost_lower_25 <- clusters$pvcost * 0.75
+
+
+if (scenarios$pvbatterycosts_sens[scenario]=="baseline"){
+  
+  usdperkwhbattery <- usdperkwhbattery
+  clusters$pvcost <- clusters$pvcost
+  
+} else if(scenarios$pvbatterycosts_sens[scenario]=="minus10pct"){
+  
+  usdperkwhbattery <- usdperkwhbattery_lower_10
+  clusters$pvcost <- clusters$pvcost_lower_10
+  
+} else{
+  
+  usdperkwhbattery <- usdperkwhbattery_lower_25
+  clusters$pvcost <- clusters$pvcost_lower_25
+  
+}
+  
+
+##########
+##########
 
 if (scenarios$instalments_business_model[scenario]==4 | scenarios$instalments_business_model[scenario]==3){
 

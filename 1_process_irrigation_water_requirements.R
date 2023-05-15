@@ -9,7 +9,7 @@
 
 #
 
-rainfed <- list.files(paste0("D:/MLED_database/", "risultati giacomo"), full.names = T, pattern = "closure", recursive=T)
+rainfed <- list.files("risultati giacomo", full.names = T, pattern = "closure", recursive=T)
 # library(mgsub)
 # rainfed_n <- mgsub(rainfed, tolower(month.abb),as.character(1:12))
 #file.rename(rainfed, rainfed_n)
@@ -35,7 +35,7 @@ clusters$area <- as.numeric(st_area(clusters)) * 0.0001 # in hectares
 
 names(rainfed) <- c("barl", "cass", "coco", "cott", "grou", "maiz", "pmil", "smil", "oilp", "pota", "rape", "rice", "sorg", "soyb", "sugb", "sugc", "sunf", "whea", "yams")
 
-files = list.files(path = paste0(input_folder, "spam_folder/spam2017v2r1_ssa_harv_area.geotiff") , pattern = 'R.tif', full.names = T)
+files = list.files(path = paste0("F:/Il mio Drive/MLED_database/input_folder/spam_folder/spam2017v2r1_ssa_harv_area.geotiff") , pattern = 'R.tif', full.names = T)
 files_crops <- tolower(unlist(qdapRegex::ex_between(files, "SSA_H_", "_R.tif")))
 files_crops <- files_crops %in% names(rainfed)
 files <- files[files_crops]
@@ -180,4 +180,4 @@ clusters <- filter(clusters_bk_all, yearly_IRREQ>0)
 
 write_rds(clusters_bk_all, paste0("clusters_bk_", paste(scenarios[scenario,], collapse="_"), ".Rds"))
 write_rds(clusters, paste0("clusters_with_data_", paste(scenarios[scenario,], collapse="_"), ".Rds"))
-#save.image("D:/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost/before_energy.RData")
+#save.image("//tsclient/D/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost/before_energy.RData")

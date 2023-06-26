@@ -8,7 +8,7 @@ setwd("C:/Users/falchetta/OneDrive - IIASA/Current papers/Groundwater_economic_f
 
 ######
 
-baseline <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+baseline <- read_rds("clusters_with_data_7_baseline_FALSE_TRUE_TRUE_4_TRUE_0.15_TRUE_median_baseline.Rds")
 baseline$geometry <- NULL
 
 baseline_summary_iso3 <- baseline %>% group_by(sov_a3) %>% dplyr::summarise(ha_rainfed_harvested_area = sum(A_total, na.rm=T)/1e6, ha_rainfed_harvested_area_econ_feas = sum(A_total[!is.na(profit_yearly)], na.rm=T)/1e6, water_irreq  = sum(yearly_IRREQ, na.rm=T)/1e9, water_irreq_per_ha_mm = (sum(yearly_IRREQ, na.rm=T)/sum(A_total, na.rm=T))/10, twh_pumping = sum(er_kwh_tt*npumps, na.rm=T)/1e9, kwh_per_m3 = sum(er_kwh_tt*npumps, na.rm=T) / sum(yearly_IRREQ, na.rm=T), feasible_pumps_thousands = sum(npumps[!is.na(profit_yearly)], na.rm=T)/1e3, tot_sys_disc_million_yrly = sum(total_system_cost_discounted_yeary[!is.na(profit_yearly)], na.rm=T)/1e6, total_revenues_discounted_discounted_yearly = sum(total_revenues_discounted_discounted_yearly[!is.na(profit_yearly)], na.rm=T)/1e6, tot_profit_yearly = sum(profit_yearly[!is.na(profit_yearly)], na.rm=T)/1e6)
@@ -34,7 +34,7 @@ baseline_summary_iso3$share_cropland_feasible <- (baseline_summary_iso3$ha_rainf
 
 baseline_summary_iso3 <- baseline_summary_iso3[,c(1,2,3,12, 4, 5, 6, 7, 8, 9, 10, 11)]
 
-colnames(baseline_summary_iso3) <- c("Country ISO3", "Rainfed harvested area (million ha)", "in which solar irrig. is econ. feas. (million ha)", "% econ. feas. area", "Total irigation (blue) water gap (bmc)", "Irrigation (blue) water gap (mm)", "Pumping energy (TWh/yr.)", "Pumping energy (kWh/m3)", "Econ. feas. pumps (million)", "Tot. sys. disc. costs (mil. USD/yr.)", "Tot. sys. disc. revenues (mil. USD/yr.)", "Tot. sys. disc. profits (mil. USD/yr.)")
+colnames(baseline_summary_iso3) <- c("Country ISO3", "Rainfed harvested area (million ha)", "in which solar irrig. is econ. feas. (million ha)", "% econ. feas. area", "Unmet crop evapotranspiration requirements (bmc)", "Unmet crop evapotranspiration requirements (mm)", "Pumping energy (TWh/yr.)", "Pumping energy (kWh/m3)", "Econ. feas. pumps (million)", "Tot. sys. disc. costs (mil. USD/yr.)", "Tot. sys. disc. revenues (mil. USD/yr.)", "Tot. sys. disc. profits (mil. USD/yr.)")
 
 library(stargazer)
 
@@ -47,7 +47,7 @@ stargazer::stargazer(baseline_summary_iso3, summary = F, out = "new_figures/Tabl
 ######
 ######
 
-clusters <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+clusters <- read_rds("clusters_with_data_7_baseline_FALSE_TRUE_TRUE_4_TRUE_0.15_TRUE_median_baseline.Rds")
 
 rainfed <- list.files("risultati giacomo", full.names = T, pattern = "closure", recursive=T)
 # library(mgsub)
@@ -84,7 +84,7 @@ gc()
 ### 
 # apply crop irrigation efficiencies
 
-crops_effs = readxl::read_xlsx(paste0(input_folder, "country_studies/zambia/mled_inputs/crops_cfs_ndays_months_ZMB.xlsx")) %>% dplyr::select(crop, eta_irr)
+crops_effs = readxl::read_xlsx("crops_cfs_ndays_months_bk.xlsx") %>% dplyr::select(crop, eta_irr)
 
 for (i in 1:length(files)){
   files[[i]] = files[[i]] / crops_effs$eta_irr[match(tolower(unlist(qdapRegex::ex_between(names(stack(files)), "SSA_H_", "_R")))[i], crops_effs$crop)]
@@ -131,22 +131,26 @@ clusters_crops <- bind_cols(clusters_crops, clusters_crops_ex)
 
 clusters_crops$geometry <- NULL
 
+clusters_crops$WR_sov_a3 <- NULL
+colnames(clusters_crops)[19] <- "WR_yams"
+
 clusters_crops <- dplyr::summarise_all(clusters_crops, sum)
 
 clusters_crops_pw <- pivot_longer(clusters_crops, cols = 1:38, names_to = c("Variable", "Crop"), names_sep = "_")
 
+clusters_crops_pw <- bind_rows(clusters_crops_pw, clusters_crops_pw %>% filter(Variable=="WR") %>% mutate(Variable="BWW", value= (value * 0.68) / 0.26))
+
 library(modelsummary)
 
-clusters_crops_pw$value <- ifelse(clusters_crops_pw$Variable=="WR", clusters_crops_pw$value/1e9, clusters_crops_pw$value/1e6)
+clusters_crops_pw$value <- ifelse(clusters_crops_pw$Variable=="WR" | clusters_crops_pw$Variable=="BWW", clusters_crops_pw$value/1e9, clusters_crops_pw$value/1e6)
 
-clusters_crops_pw$Variable <- ifelse(clusters_crops_pw$Variable=="WR", "Total irigation (blue) water gap (bmc)", "Rainfed harvested area (million ha)")
-
+clusters_crops_pw$Variable <- ifelse(clusters_crops_pw$Variable=="WR", "Crop evapotranspiration (blue) water gap (bmc)", ifelse(clusters_crops_pw$Variable=="BWW", "Total blue water withdrawal requirements water gap (bmc)", "Rainfed harvested area (million ha)"))
 
 datasummary(Crop ~ Variable * value * mean, data = clusters_crops_pw, output = "new_figures/Table_SI_crop.docx")
 
 ################
 
-baseline <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+baseline <-read_rds("clusters_with_data_7_baseline_FALSE_TRUE_TRUE_4_TRUE_0.15_TRUE_median_baseline.Rds")
 baseline$geometry <- NULL
 
 baseline_summary_iso3 <- baseline %>% group_by(sov_a3) %>% dplyr::summarise(calories = sum(calories_gain_total[!is.na(profit_yearly)], na.rm=T)/1e9, calories_capita_day = (sum(calories_gain_total[!is.na(profit_yearly)], na.rm=T)/sum(pop, na.rm=T))/365, deficit=mean(Calories_gap, na.rm=T))

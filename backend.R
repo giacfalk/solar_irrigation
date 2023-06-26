@@ -9,9 +9,15 @@ tmpDir(create=TRUE)
 
 if (!require("rgis")) remotes::install_github("JGCRI/rgis"); library(rgis)
 
-ee_Initialize(user = email, drive = TRUE)
+#ee_Initialize(user = email, drive = TRUE)
 
 rasterOptions(tmpdir=input_folder)
+
+###
+
+exact_extract <- purrr::partial(exactextractr::exact_extract, max_cells_in_memory = 1e9 )
+
+###
 
 mask_raster_to_polygon <- function (raster_object, polygon) 
 {
@@ -91,7 +97,7 @@ truck_bearing_t = 15 # (tons) # REF: https://en.wikipedia.org/wiki/Dump_truck
 #Pumo economic parameters
 lifetimepump = 20
 
-traveltime_market = ee$Image("Oxford/MAP/accessibility_to_cities_2015_v1_0")
+#traveltime_market = ee$Image("Oxford/MAP/accessibility_to_cities_2015_v1_0")
 diesel_price <- raster(paste0(input_folder, "diesel_price_baseline_countryspecific_0505.tif"))
 
 #

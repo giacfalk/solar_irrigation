@@ -11,6 +11,14 @@ setwd("C:/Users/falchetta/OneDrive - IIASA/Current papers/Groundwater_economic_f
 
 baseline <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
 
+####
+
+(sum(clusters$yearly_IRREQ)) / 1e9
+((sum(clusters$yearly_IRREQ) * 0.68) / 0.26) / 1e9
+
+(sum(clusters$yearly_IRREQ[!is.na(clusters$profit_yearly)])) / 1e9
+((sum(clusters$yearly_IRREQ[!is.na(clusters$profit_yearly)]) * 0.68) / 0.26) / 1e9
+
 # - how much harvested rainfed area there is in SSA in total
 
 files = list.files(path = paste0("F:/Il mio Drive/MLED_database/input_folder/spam_folder/spam2017v2r1_ssa_harv_area.geotiff") , pattern = 'R.tif', full.names = T)
@@ -47,7 +55,7 @@ envflow <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[4,], collaps
 sum(baseline$A_total[!is.na(baseline$profit_yearly)])/1e6 # million ha
 sum(envflow$A_total[!is.na(envflow$profit_yearly)])/1e6 # million ha
 
-sum(baseline$yearly_IRREQ*(1-baseline$monthly_unmet_IRRIG_share_1))/1e9 # million ha
+sum(baseline$yearly_IRREQ*(1-baseline$monthly_unmet_IRRIG_share_1))/1e9 # mkm
 sum(envflow$yearly_IRREQ*(1-envflow$monthly_unmet_IRRIG_share_1))/1e9 # million ha
 
 sum(envflow$A_total*(envflow$monthly_unmet_IRRIG_share_avg>=0.25))/sum(baseline$A_total) # million ha

@@ -61,9 +61,9 @@ uno <- ggplot(t1, aes(x=rcp_ssp, y=i_n/1e9, fill=rcp_ssp))+
   theme_classic()+
   geom_col()+
   xlab("")+
-  ylab("Cubic km of freshwater")+
+  ylab("Cubic km/yr.")+
   ggsci::scale_fill_npg(name="Scenario")+
-  ggtitle("Total irrigation needs in 2050")
+  ggtitle("Rainfed crop evapotrans. needs in 2050")
 
 #ggsave("//tsclient/D/OneDrive - IIASA/Conferences 2022/Scenarios Forum/LEAPRE submission/fig1.png", uno, scale = 1.5)
 
@@ -162,6 +162,14 @@ tre <- ggplot(shares, aes(x=rcp_ssp, y=value/sum_cat, fill=variable))+
 
 ###
 
+baseline_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[1,], collapse="_"), ".Rds"))
+s_245_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[2,], collapse="_"), ".Rds"))
+s_585_T <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[3,], collapse="_"), ".Rds"))
+
+baseline_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[4,], collapse="_"), ".Rds"))
+s_245_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[5,], collapse="_"), ".Rds"))
+s_585_F <- read_rds(paste0("clusters_with_data_7_", paste(scenarios[6,], collapse="_"), ".Rds"))
+
 baseline_F_wg <- dplyr::select(baseline_F, contains("monthly_unmet_IRRIG_share_") & !contains("surf") & !contains("avg"))
 s_245_F_wg <- dplyr::select(s_245_F, contains("monthly_unmet_IRRIG_share_") & !contains("surf") & !contains("avg"))
 s_585_F_wg <- dplyr::select(s_585_F, contains("monthly_unmet_IRRIG_share_") & !contains("surf") & !contains("avg"))
@@ -190,9 +198,7 @@ baseline_F_wg <- summarise_all(baseline_F_wg,.funs = "sum")
 s_245_F_wg <- summarise_all(s_245_F_wg,.funs = "sum")
 s_585_F_wg <- summarise_all(s_585_F_wg,.funs = "sum")
 
-baseline_F_wg$monthly_unmet_IRRIG_share_2 <- mean(c(baseline_F_wg$monthly_unmet_IRRIG_share_1, baseline_F_wg$monthly_unmet_IRRIG_share_3))
-s_245_F_wg$monthly_unmet_IRRIG_share_2 <- mean(c(s_245_F_wg$monthly_unmet_IRRIG_share_1, s_245_F_wg$monthly_unmet_IRRIG_share_3))
-s_585_F_wg$monthly_unmet_IRRIG_share_2 <- mean(c(s_585_F_wg$monthly_unmet_IRRIG_share_1, s_585_F_wg$monthly_unmet_IRRIG_share_3))
+#
 
 baseline_F_wg <- melt(baseline_F_wg)
 baseline_F_wg$variable <- month.abb
@@ -211,11 +217,14 @@ all <- bind_rows(baseline_F_wg, s_245_F_wg, s_585_F_wg)
 all$scen <- factor(all$scen, levels = c("Baseline", "SSP 245", "SSP 585"))
 all$variable <- factor(all$variable, levels = month.abb)
 
+all %>% group_by(scen) %>% dplyr::summarise(value=sum(value)/1e9)
+all %>% filter(variable=="Aug") %>%  group_by(scen) %>% dplyr::summarise(value=sum(value)/1e9)
+
 quattro <- ggplot(all, aes(x=variable, y=value/1e9, colour=scen, group=scen))+
  geom_line(show.legend=F)+
   theme_classic()+
   xlab("Month of the year")+
-  ylab("Cubic km of groundwater")+
+  ylab("Km^3 groundwater requir.")+
   ggsci::scale_colour_npg(name="Climate change scenario")+
   ggtitle("Unmet groundwater demand  in 2050")
 

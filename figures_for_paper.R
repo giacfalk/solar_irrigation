@@ -88,6 +88,12 @@ regions_data$variable <- gsub("sum.layer.", "", regions_data$variable)
 
 regions_data$region[regions_data$region=="Middle Africa"] <- "Central Africa"
 
+###
+
+regions_data$value <- (regions_data$value * 0.68) / 0.26
+
+###
+
 fig2a <- ggplot(regions_data)+
   theme_classic()+
   geom_point(aes(x=as.numeric(variable), y=value/1e3, group=region, colour=region), size=2)+

@@ -77,7 +77,7 @@ clusters$pvcost <- ifelse(is.nan(clusters$pvcost), pred, clusters$pvcost)
 
 ###
 
-if(nrow(clusters)!=nrow(read.csv("pvout_t.csv"))){pvout_t <- stack(pblapply(list.files(paste0(input_folder, "monthly"), full.names = T, pattern = "asc"), raster)) ; pvout_t <-  exact_extract(pvout_t, clusters, "mean", max_cells_in_memory = 1e9); pvout_t <- (pvout_t/30) * 0.65; write.csv(pvout_t, "pvout_t.csv")} else{
+if(nrow(clusters)!=nrow(read.csv("pvout_t.csv"))){pvout_t <- stack(pblapply(list.files(paste0(input_folder, "monthly"), full.names = T, pattern = "asc"), raster)) ; pvout_t <-  exact_extract(pvout_t, clusters, "mean"); pvout_t <- (pvout_t/30) * 0.65; write.csv(pvout_t, "pvout_t.csv")} else{
   pvout_t <- read.csv("pvout_t.csv")
   pvout_t$X<- NULL
 }

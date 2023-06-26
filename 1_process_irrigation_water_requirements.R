@@ -48,7 +48,7 @@ gc()
 ### 
 # apply crop irrigation efficiencies
 
-crops_effs = readxl::read_xlsx(paste0(input_folder, "country_studies/zambia/mled_inputs/crops_cfs_ndays_months_ZMB.xlsx")) %>% dplyr::select(crop, eta_irr)
+crops_effs = readxl::read_xlsx("crops_cfs_ndays_months_bk.xlsx") %>% dplyr::select(crop, eta_irr)
 
 for (i in 1:length(files)){
 files[[i]] = files[[i]] / crops_effs$eta_irr[match(tolower(unlist(qdapRegex::ex_between(names(stack(files)), "SSA_H_", "_R")))[i], crops_effs$crop)]

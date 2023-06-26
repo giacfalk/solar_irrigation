@@ -8,7 +8,7 @@
 
 setwd("C:/Users/falchetta/OneDrive - IIASA/Current papers/Groundwater_economic_feasibility/Groundwater-Cost/Groundwater-Cost")
 
-input_folder <- "C:/input_folder/"
+input_folder <- "H:/ECIP/Falchetta/MLED_database/input_folder/"
 
 email<- "giacomo.falchetta@gmail.com"
 
@@ -41,9 +41,11 @@ scenarios <- expand.grid(rcp_ssp, water_sustainability_contraint, field_size_con
 colnames(scenarios) <- c("rcp_ssp", "water_sustainability_contraint", "field_size_contraint", "VAT_import_costs", "instalments_business_model", "water_tank_storage", "discount_rate", "no_battery", "prices_sens", "pvbatterycosts_sens")
 
 scenarios_selected <- c(1:3, 4:6, 7, 13, 25, 49, 73, 97, 193, 385, 577, 769, 1537, 3073, 4609, 9217)
-View(scenarios[scenarios_selected,])
+#View(scenarios[scenarios_selected,])
 
 for (scenario in scenarios_selected){
+  
+  print(timestamp())
   print(scenario)
   
   discount_rate <- scenarios$discount_rate[scenario]
@@ -66,6 +68,8 @@ for (scenario in scenarios_selected){
   #source("6_results_plots_tables.R", echo=F)
   
   source("7_food_security_implications.R", echo=F)
+  
+  print(timestamp())
   
   save <- c("scenarios", "read_existing_clusters", "email", "input_folder", "scenarios_selected")
   rm(list=setdiff(ls(), save))  
